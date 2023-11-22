@@ -66,7 +66,7 @@ export class ShowtimeFixedService {
             to avoid duplicate showtime entries. With that setup, I would not have to worry about id duplication and would use an upsert query
             to increment the showtime count any time a duplicate record arrives which voilates unique constraint I added on "showtime" table. 
             But again, since I dont have enough context for showtimeId column's purpose I'll leave it as it is and just abort the transaction if
-            showtimeId is duplicated.
+            showtimeId is duplicated. Lastly I'd also delete showtime-summary table as it's no longer needed.
     */
     await this.dataSource.transaction(async (manager) => {
       for (const showtime of showtimes) {
