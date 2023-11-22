@@ -16,33 +16,6 @@ export class ShowtimeFixedService {
 
   /* This query is useless now as we implement counting in showtime table directly */
   //   private async updateShowtimeSummary() {
-  //     await this.dataSource.query(`
-  //         INSERT INTO "showtime-summary"
-  //         ("showtimeDate",
-  //          "cinemaName",
-  //          "movieTitle",
-  //          attributes,
-  //          city,
-  //          "showtimeCount")
-  //         select date(showtime."showtimeInUTC" AT TIME ZONE 'UTC'),
-  //             showtime."cinemaName",
-  //             showtime."movieTitle",
-  //             showtime.attributes,
-  //             showtime.city,
-  //             count(*)
-  //         from "showtime"
-  //         group by 1, 2, 3, 4, 5
-  //         ON CONFLICT
-  //             (
-  //             "showtimeDate",
-  //             "cinemaName",
-  //             "movieTitle",
-  //             attributes,
-  //             city
-  //             )
-  //             DO UPDATE
-  //                    SET "showtimeCount"= EXCLUDED."showtimeCount"
-  //     `);
   //   }
 
   async addShowtimes(showtimes: ShowtimeInterface[]) {
