@@ -5,10 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
+  OneToOne,
 } from 'typeorm';
+import { ShowtimeSummaryEntity } from './showtimeSummary.entity';
 
 @Entity({ name: 'showtime', orderBy: { id: 'ASC' } })
-@Unique(['showtimeInUTC', 'cinemaName', 'movieTitle', 'attributes'])
+/** Adding indexes to speed up the select query in updateShowtimeSummary() */
+@Unique(['showtimeInUTC', 'cinemaName', 'movieTitle', 'attributes', 'city'])
 export class ShowtimeEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -40,6 +43,6 @@ export class ShowtimeEntity {
   @Column({ nullable: true, default: null })
   city: string;
 
-  @Column({ nullable: false })
-  showtimeCount: number;
+  @OneToOne(() => ShowtimeSummaryEntity, (summary) => summary.showtime)
+  summary: ShowtimeSummaryEntity;
 }

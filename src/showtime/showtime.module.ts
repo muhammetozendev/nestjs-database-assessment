@@ -3,11 +3,10 @@ import { ShowtimeService } from './showtime.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ShowtimeEntity } from './entity/showtime.entity';
 import { ShowtimeSummaryEntity } from './entity/showtimeSummary.entity';
-import { ShowtimeFixedService } from './showtime-fixed.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ShowtimeEntity, ShowtimeSummaryEntity])],
-  providers: [ShowtimeService, ShowtimeFixedService],
+  providers: [ShowtimeService],
   exports: [],
 })
 export class ShowtimeModule {}
