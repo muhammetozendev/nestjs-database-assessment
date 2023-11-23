@@ -23,6 +23,9 @@ export class ShowtimeService {
      * get the relevant information like "showtimeInUTC", "cinemaName", "movieTitle", "attributes", "city" for each report
      * using a simple join query. Please see the entities to understand more about the relation.
      *
+     * Sample query:
+     *      select "showtime-summary"."showtimeCount", "showtime"."cinemaName" from "showtime-summary" join showtime on showtime.id = "showtime-summary"."showtimeId";
+     *
      * Side note:
      *  Also, I'm running the following query using the transactional entity manager in order to avoid inconsistencies.
      *  The queries in addShowTimes and updateShowtimeSummary should be run in the same transaction.
