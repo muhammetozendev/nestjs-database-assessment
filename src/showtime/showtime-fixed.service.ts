@@ -93,6 +93,7 @@ export class ShowtimeService {
           .execute();
       }
 
+      // Clearing the showtime-summary table for consistency
       await em
         .createQueryBuilder()
         .delete()
