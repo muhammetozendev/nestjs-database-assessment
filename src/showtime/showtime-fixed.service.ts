@@ -22,6 +22,10 @@ export class ShowtimeService {
      * first record in each aggregated group. That way I dont have to duplicate the columns and using the relation, I can
      * get the relevant information like "showtimeInUTC", "cinemaName", "movieTitle", "attributes", "city" for each report
      * using a simple join query. Please see the entities to understand more about the relation.
+     *
+     * Side note:
+     *  Also, I'm running the following query using the transactional entity manager in order to avoid inconsistencies.
+     *  The queries in addShowTimes and updateShowtimeSummary should be run in the same transaction.
      */
     await em.query(`
         INSERT INTO "showtime-summary"
@@ -41,11 +45,6 @@ export class ShowtimeService {
         DO UPDATE
            SET "showtimeCount"= EXCLUDED."showtimeCount"
     `);
-    // TODO: Investigate and resolve the duplication issue in the "showtime-summary" table.
-    // If you check the "showtime-summary" table rows you will notice that there duplicate rows.
-    // Analyze the current aggregation query to identify why duplicates are being created.
-    // Modify the query or the table structure as necessary to prevent duplicate entries.
-    // Ensure your solution maintains data integrity and optimizes performance.
   }
 
   async addShowtimes(showtimes: ShowtimeInterface[]) {
@@ -54,10 +53,15 @@ export class ShowtimeService {
      * and I am updating the resource any time a duplicate showtimeId arrives as we always want to
      * operate with the most recent data.
      *
-     * However, when I update the resource, some records in showtime-summary table will be invalid.
-     * In order to clean up those invalid records, I have created a trigger which can be found in
-     * src/migrations/1700744414056-SummaryCleanupTrigger.ts. The trigger removes all the reports
-     * whose id is pointing at the updated record.
+     * However, when I update the resource, it will invalidate some records in the showtime-summary table.
+     * For example, if I update cinema name of a resource, a record in showtime-summary table might have invalid
+     * showtime count as the updated record will no longer belong to that group. To avoid these problems, I'll first
+     * remove the contents of the showtime-summary table and then repopulate it with the updated data.
+     *
+     * Side note:
+     *  If we dont need the overhead of deleting and repopulating the showtime-summary table, we can simply skip
+     *  the conflicting rows and take no action, or even abort the transaction. However, since I think losing the
+     *  scraped data isn't what we want, I'll go with this approach.
      */
     this.dataSource.transaction(async (em: EntityManager) => {
       for (const showtime of showtimes) {
@@ -84,12 +88,14 @@ export class ShowtimeService {
             ['showtimeId']
           )
           .execute();
-
-        // TODO: Implement error handling for cases where a duplicate 'showtimeId' is used during insertion.
-        // Consider how the application should behave in this scenario (e.g., skip, replace, or abort the operation).
-        // Implement the necessary logic and provide feedback or logging for the operation outcome.
-        // Ensure your solution handles such conflicts gracefully without causing data inconsistency or application failure.
       }
+
+      await em
+        .createQueryBuilder()
+        .delete()
+        .from(ShowtimeSummaryEntity)
+        .execute();
+
       await this.updateShowtimeSummary(em);
     });
   }

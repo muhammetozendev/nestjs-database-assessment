@@ -5,7 +5,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { ScraperResponseDto } from './dto/scraper-response.dto';
 import * as cheerio from 'cheerio';
 import { WebsiteData } from './interface/website-data.interface';
-import { ShowtimeService } from '../showtime/showtime.service';
+import { ShowtimeService } from '../showtime/showtime-fixed.service';
 
 @Injectable()
 export class ScraperService {
@@ -13,7 +13,7 @@ export class ScraperService {
 
   constructor(
     private readonly httpService: HttpService,
-    private readonly showtimeService: ShowtimeService,
+    private readonly showtimeService: ShowtimeService
   ) {}
 
   private async fetchHtml(ur: string): Promise<string> {
@@ -23,8 +23,8 @@ export class ScraperService {
           const msg = error?.response?.data || error?.response || error;
           this.logger.error(msg);
           throw 'An error happened!';
-        }),
-      ),
+        })
+      )
     );
     return data;
   }
@@ -69,6 +69,14 @@ export class ScraperService {
         bookingLink: 'https://uae.voxcinemas.com/booking/0009-170678',
         attributes: ['Standard'],
       },
+      {
+        showtimeId: '1',
+        cinemaName: 'Cinema 1',
+        movieTitle: 'Title 1',
+        showtimeInUTC: '2023-11-03T17:30:00Z',
+        bookingLink: 'https://uae.voxcinemas.com/booking/0009-1321232',
+        attributes: ['Abc'],
+      },
     ];
 
     /*
@@ -93,12 +101,39 @@ export class ScraperService {
   }
 
   async scrape(url: string): Promise<ScraperResponseDto> {
-    const html = await this.fetchHtml(url);
-    const websiteData: WebsiteData = this.parseHtml(html);
-    await this.showtimeService.addShowtimes(websiteData.showtimes);
+    // const html = await this.fetchHtml(url);
+    // const websiteData: WebsiteData = this.parseHtml(html);
+    const showtimes: ShowtimeInterface[] = [
+      //Sample data
+      {
+        showtimeId: '0009-170678',
+        cinemaName: 'Al Hamra Mall - Ras Al Khaimah',
+        movieTitle: 'Taylor Swift: The Eras Tour',
+        showtimeInUTC: '2023-11-03T17:30:00Z',
+        bookingLink: 'https://uae.voxcinemas.com/booking/0009-170678',
+        attributes: ['Standard'],
+      },
+      {
+        showtimeId: '1',
+        cinemaName: 'Cinema 1',
+        movieTitle: 'Title 1',
+        showtimeInUTC: '2023-11-03T17:30:00Z',
+        bookingLink: 'https://uae.voxcinemas.com/booking/0009-1321232',
+        attributes: ['Abc'],
+      },
+      {
+        showtimeId: '2',
+        cinemaName: 'Cinema 1',
+        movieTitle: 'Title 1',
+        showtimeInUTC: '2023-11-03T17:30:00Z',
+        bookingLink: 'https://uae.voxcinemas.com/booking/0009-1321232',
+        attributes: ['Abc'],
+      },
+    ];
+    await this.showtimeService.addShowtimes(showtimes);
     return {
       requestUrl: url,
-      responseData: websiteData,
+      responseData: null,
     };
   }
 }

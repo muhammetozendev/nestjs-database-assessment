@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ShowtimeService } from './showtime.service';
+import { ShowtimeService } from './showtime-fixed.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ShowtimeEntity } from './entity/showtime.entity';
 import { ShowtimeSummaryEntity } from './entity/showtimeSummary.entity';

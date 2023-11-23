@@ -25,8 +25,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           entities: [ShowtimeEntity, ShowtimeSummaryEntity],
           synchronize: true,
           logging: true,
-          migrations: ['dist/migrations/*.js'],
-          migrationsRun: true,
         };
       },
       imports: [ConfigModule],
